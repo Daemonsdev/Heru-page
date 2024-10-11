@@ -2,7 +2,7 @@ const axios = require('axios');
 
 module.exports = {
   name: 'boxai',
-  description: 'Ask a question to GPT-4',
+  description: 'Ask a question to blackbox Ai',
   author: 'Deku (rest api)',
   async execute(senderId, args, pageAccessToken, sendMessage) {
     const prompt = args.join(' ');
