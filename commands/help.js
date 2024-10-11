@@ -11,11 +11,11 @@ module.exports = {
 
     const commands = commandFiles.map(file => {
       const command = require(path.join(commandsDir, file));
-      return `◉ ${command.name}\n  ◉ ${command.description}\n`;
+      return `◉ ${command.name} - ${command.description}`;
     });
 
     const totalCommands = commandFiles.length;
-    const helpMessage = `Here are the available commands: \nTotal commands: ${totalCommands} \n\n${commands.join('\n\n')}`;
+    const helpMessage = `Here are the available commands: \nTotal commands: ${totalCommands}\n${commands.join('\n')}`;
     
     sendMessage(senderId, { text: helpMessage }, pageAccessToken);
   }
