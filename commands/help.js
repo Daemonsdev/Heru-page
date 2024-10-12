@@ -37,4 +37,3 @@ module.exports = {
     sendMessage(senderId, payload, pageAccessToken);
   }
 };
-    
