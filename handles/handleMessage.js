@@ -12,74 +12,31 @@ for (const file of commandFiles) {
 
 async function handleMessage(event, pageAccessToken) {
   const senderId = event.sender.id;
-  const messageText = event.message.text ? event.message.text.trim() : null;
-  const payload = event.message.quick_reply ? event.message.quick_reply.payload : null;
+  const messageText = event.message.text.trim();
+  
+  const args = messageText.split(' ');
+  const commandName = args.shift().toLowerCase();
 
-  // Handle command-based messages
-  if (messageText) {
-    const args = messageText.split(' ');
-    const commandName = args.shift().toLowerCase();
-
-    if (commands.has(commandName)) {
-      const command = commands.get(commandName);
-      try {
-        await command.execute(senderId, args, pageAccessToken, sendMessage);
-      } catch (error) {
-        console.error(`Error executing command ${commandName}:`, error);
-        sendMessage(senderId, { text: 'There was an error executing that command.' }, pageAccessToken);
-      }
-      return;
+  if (commands.has(commandName)) {
+    const command = commands.get(commandName);
+    try {
+      await command.execute(senderId, args, pageAccessToken, sendMessage);
+    } catch (error) {
+      console.error(`Error executing command ${commandName}:`, error);
+      sendMessage(senderId, { text: 'There was an error executing that command.' }, pageAccessToken);
     }
-
-    const aiCommand = commands.get('ai');
-    if (aiCommand) {
-      try {
-        await aiCommand.execute(senderId, messageText, pageAccessToken, sendMessage);
-      } catch (error) {
-        console.error('Error executing Ai command:', error);
-        sendMessage(senderId, { text: 'There was an error processing your request.' }, pageAccessToken);
-      }
-    }
+    return;
   }
 
-  // Handle payload button interactions
-  if (payload) {
+  const aiCommand = commands.get('ai');
+  if (aiCommand) {
     try {
-      const payloadArgs = payload.split(' ');
-      const payloadCommandName = payloadArgs.shift().toLowerCase();
-
-      if (commands.has(payloadCommandName)) {
-        const payloadCommand = commands.get(payloadCommandName);
-        await payloadCommand.execute(senderId, payloadArgs, pageAccessToken, sendMessage);
-      } else {
-        sendMessage(senderId, { text: 'Unknown payload action received.' }, pageAccessToken);
-      }
+      await aiCommand.execute(senderId, messageText, pageAccessToken, sendMessage);
     } catch (error) {
-      console.error('Error handling payload button interaction:', error);
+      console.error('Error executing Ai command:', error);
       sendMessage(senderId, { text: 'There was an error processing your request.' }, pageAccessToken);
     }
-  }
-
-  // Send the Playsbot Privacy Policy attachment if no other command or payload is triggered
-  if (!messageText && !payload) {
-    sendMessage(senderId, {
-      attachment: {
-        type: 'template',
-        payload: {
-          template_type: 'button',
-          text: `To read the Playsbot Privacy Policy, please read the Privacy Policy and how we process your data:\nhttps://playsbotv2.kenliejugarap.com/privacy_policy/`,
-          buttons: [
-            {
-              type: 'web_url',
-              url: `https://playsbotv2.kenliejugarap.com/privacy_policy/`,
-              title: 'Privacy Policy'
-            }
-          ]
-        }
-      }
-    }, pageAccessToken);
   }
 }
 
 module.exports = { handleMessage };
-      
