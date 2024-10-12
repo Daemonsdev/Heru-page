@@ -15,8 +15,8 @@ module.exports = {
     });
 
     const totalCommands = commandFiles.length;
-    const helpMessage = `Here are the available commands: \nTotal commands: ${totalCommands}\n${commands.join('\n')}`;
-    
+    const helpMessage = `Available Commands\n━━━━━━━━━━━━━━━━━━\nTotal commands: ${totalCommands}\n\n${commands.join('\n')}\n\n◉ For further assistance, please contact the developer\n◉ Facebook: https://www.facebook.com/jaymar.dev.00`;
+
     sendMessage(senderId, { text: helpMessage }, pageAccessToken);
   }
 };
