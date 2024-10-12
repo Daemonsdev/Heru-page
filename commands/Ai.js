@@ -5,7 +5,6 @@ const groq = new Groq({ apiKey: 'gsk_4awNsXxTaA6N1kHCNDUwWGdyb3FY9h9hnu5rIU9fVGx
 const messageHistory = new Map();
 const maxMessageLength = 2000;
 
-// Function to split a message into chunks of specified length
 function splitMessageIntoChunks(text, maxLength) {
   const messages = [];
   for (let i = 0; i < text.length; i += maxLength) {
@@ -23,7 +22,6 @@ module.exports = {
     try {
       console.log("User Message:", messageText);
 
-      // Send an empty message to indicate processing
       sendMessage(senderId, { text: '' }, pageAccessToken);
 
       let userHistory = messageHistory.get(senderId) || [];
@@ -36,7 +34,7 @@ module.exports = {
         messages: userHistory,
         model: 'llama3-8b-8192',
         temperature: 1,
-        max_tokens: 1025, // You can increase this limit if necessary
+        max_tokens: 1025,
         top_p: 1,
         stream: true,
         stop: null
@@ -46,25 +44,21 @@ module.exports = {
       
       for await (const chunk of chatCompletion) {
         const chunkContent = chunk.choices[0]?.delta?.content || '';
-        responseMessage += chunkContent; // Compile the complete response
+        responseMessage += chunkContent;
         
-        // Check if the current response message exceeds the max length
         if (responseMessage.length >= maxMessageLength) {
           const messages = splitMessageIntoChunks(responseMessage, maxMessageLength);
           for (const message of messages) {
-            sendMessage(senderId, { text: message }, pageAccessToken); // Send each chunk
+            sendMessage(senderId, { text: message }, pageAccessToken);
           }
-          responseMessage = ''; // Reset responseMessage after sending
+          responseMessage = '';
         }
       }
 
-      // Log the raw response from the API
       console.log("Raw API Response:", responseMessage);
 
-      // Append the guide message to the final response
       const guideMessage = `\n\n◉ Guide: type "/help" to see all commands, Please follow my developer\n◉ Facebook: https://www.facebook.com/jaymar.dev.00`;
 
-      // Send any remaining part of the response with the guide message included
       if (responseMessage) {
         responseMessage += guideMessage;
         userHistory.push({ role: 'assistant', content: responseMessage });
@@ -72,7 +66,7 @@ module.exports = {
 
         const finalMessages = splitMessageIntoChunks(responseMessage, maxMessageLength);
         for (const message of finalMessages) {
-          sendMessage(senderId, { text: message }, pageAccessToken); // Send each chunk
+          sendMessage(senderId, { text: message }, pageAccessToken);
         }
       } else {
         throw new Error("Received empty response from Groq.");
