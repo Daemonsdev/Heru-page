@@ -61,7 +61,7 @@ module.exports = {
 
       if (responseMessage) {
         responseMessage += guideMessage;
-        userHistory.push({ role: 'Assistant', content: responseMessage });
+        userHistory.push({ role: 'assistant', content: responseMessage });
         messageHistory.set(senderId, userHistory);
 
         const finalMessages = splitMessageIntoChunks(responseMessage, maxMessageLength);
