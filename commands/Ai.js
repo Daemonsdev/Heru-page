@@ -57,7 +57,7 @@ module.exports = {
 
       console.log("Raw API Response:", responseMessage);
 
-      const guideMessage = `\n\n◉ Guide: type "help" to see all commands, Please follow my developer\n◉ Facebook: https://www.facebook.com/jaymar.dev.00`;
+      const guideMessage = `\n\n◉ Guide: type "help" to see all commands`;
 
       if (responseMessage) {
         responseMessage += guideMessage;
