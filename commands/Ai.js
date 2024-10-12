@@ -57,11 +57,11 @@ module.exports = {
 
       console.log("Raw API Response:", responseMessage);
 
-      const guideMessage = `\n\n◉ Guide: type "/help" to see all commands, Please follow my developer\n◉ Facebook: https://www.facebook.com/jaymar.dev.00`;
+      const guideMessage = `\n\n◉ Guide: type "help" to see all commands, Please follow my developer\n◉ Facebook: https://www.facebook.com/jaymar.dev.00`;
 
       if (responseMessage) {
         responseMessage += guideMessage;
-        userHistory.push({ role: 'assistant', content: responseMessage });
+        userHistory.push({ role: 'Assistant', content: responseMessage });
         messageHistory.set(senderId, userHistory);
 
         const finalMessages = splitMessageIntoChunks(responseMessage, maxMessageLength);
