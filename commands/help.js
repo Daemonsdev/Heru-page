@@ -17,6 +17,24 @@ module.exports = {
     const totalCommands = commandFiles.length;
     const helpMessage = `Available Commands\n━━━━━━━━━━━━━━━━━━\nTotal commands: ${totalCommands}\n\n${commands.join('\n')}\n\n◉ For further assistance, please contact the developer\n◉ Facebook: https://www.facebook.com/jaymar.dev.00`;
 
-    sendMessage(senderId, { text: helpMessage }, pageAccessToken);
+    const payload = {
+      text: helpMessage,
+      buttons: [
+        {
+          type: 'postback',
+          title: 'Contact Developer',
+          payload: 'CONTACT_DEVELOPER'
+        },
+        {
+          type: 'web_url',
+          title: 'Visit Facebook',
+          url: 'https://www.facebook.com/jaymar.dev.00',
+          webview_height_ratio: 'full'
+        }
+      ]
+    };
+
+    sendMessage(senderId, payload, pageAccessToken);
   }
 };
+    
