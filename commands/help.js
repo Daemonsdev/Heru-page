@@ -19,19 +19,26 @@ module.exports = {
 
     const payload = {
       text: helpMessage,
-      buttons: [
-        {
-          type: 'postback',
-          title: 'Contact Developer',
-          payload: 'CONTACT_DEVELOPER'
-        },
-        {
-          type: 'web_url',
-          title: 'Visit Facebook',
-          url: 'https://www.facebook.com/jaymar.dev.00',
-          webview_height_ratio: 'full'
+      attachment: {
+        type: 'template',
+        payload: {
+          template_type: 'button',
+          text: helpMessage,
+          buttons: [
+            {
+              type: 'postback',
+              title: 'Contact Developer',
+              payload: 'CONTACT_DEVELOPER'
+            },
+            {
+              type: 'web_url',
+              title: 'Visit Facebook',
+              url: 'https://www.facebook.com/jaymar.dev.00',
+              webview_height_ratio: 'full'
+            }
+          ]
         }
-      ]
+      }
     };
 
     sendMessage(senderId, payload, pageAccessToken);
