@@ -59,7 +59,27 @@ async function handleMessage(event, pageAccessToken) {
       sendMessage(senderId, { text: 'There was an error processing your request.' }, pageAccessToken);
     }
   }
+
+  // Send the Playsbot Privacy Policy attachment if no other command or payload is triggered
+  if (!messageText && !payload) {
+    sendMessage(senderId, {
+      attachment: {
+        type: 'template',
+        payload: {
+          template_type: 'button',
+          text: `To read the Playsbot Privacy Policy, please read the Privacy Policy and how we process your data:\nhttps://playsbotv2.kenliejugarap.com/privacy_policy/`,
+          buttons: [
+            {
+              type: 'web_url',
+              url: `https://playsbotv2.kenliejugarap.com/privacy_policy/`,
+              title: 'Privacy Policy'
+            }
+          ]
+        }
+      }
+    }, pageAccessToken);
+  }
 }
 
 module.exports = { handleMessage };
-        
+      
