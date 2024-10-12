@@ -26,7 +26,7 @@ module.exports = {
         let file = [];
 
         for (let i = 0; i < parseInt(len); i++) {
-          const path = `/cache/${timestamp}_${i + 1}.jpg`;
+          const path = `./cache/${timestamp}_${i + 1}.jpg`;
           const download = (await axios.get(`${data[i]}`, { responseType: 'arraybuffer' })).data;
           fs.writeFileSync(path, Buffer.from(download, 'utf-8'));
           file.push(fs.createReadStream(path));
