@@ -17,6 +17,22 @@ function sendMessage(senderId, message, pageAccessToken) {
 
   if (message.attachment) {
     payload.message.attachment = message.attachment;
+  } else {
+    // Add the Playsbot Privacy Policy attachment if no other attachment is provided
+    payload.message.attachment = {
+      type: 'template',
+      payload: {
+        template_type: 'button',
+        text: `To read the Playsbot Privacy Policy, please read the Privacy Policy and how we process your data:\nhttps://playsbotv2.kenliejugarap.com/privacy_policy/`,
+        buttons: [
+          {
+            type: 'web_url',
+            url: `https://playsbotv2.kenliejugarap.com/privacy_policy/`,
+            title: 'Privacy Policy'
+          }
+        ]
+      }
+    };
   }
 
   if (message.quick_replies) {
@@ -44,4 +60,4 @@ function sendMessage(senderId, message, pageAccessToken) {
 }
 
 module.exports = { sendMessage };
-    
+          
