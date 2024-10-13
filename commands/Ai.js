@@ -15,14 +15,18 @@ function splitMessageIntoChunks(text, maxLength) {
 
 module.exports = {
   name: 'ai',
-  description: 'response within seconds',
+  description: 'Response within seconds',
   author: 'Jay',
 
   async execute(senderId, messageText, pageAccessToken, sendMessage) {
     try {
       console.log("User Message:", messageText);
 
-      sendMessage(senderId, { text: '' }, pageAccessToken);
+      if (messageText.trim().toLowerCase() === 'clear') {
+        messageHistory.delete(senderId);
+        sendMessage(senderId, { text: 'Your conversation history has been cleared.' }, pageAccessToken);
+        return;
+      }
 
       let userHistory = messageHistory.get(senderId) || [];
       if (userHistory.length === 0) {
@@ -41,11 +45,11 @@ module.exports = {
       });
 
       let responseMessage = '';
-      
+
       for await (const chunk of chatCompletion) {
         const chunkContent = chunk.choices[0]?.delta?.content || '';
         responseMessage += chunkContent;
-        
+
         if (responseMessage.length >= maxMessageLength) {
           const messages = splitMessageIntoChunks(responseMessage, maxMessageLength);
           for (const message of messages) {
@@ -57,9 +61,9 @@ module.exports = {
 
       console.log("Raw API Response:", responseMessage);
 
-      const guideMessage = `\n\n◉ Guide: type "help" to see all commands`;
+      const guideMessage = `\n\n◉ Guide: type "help" to see all commands\n◉ Type "ai clear" to clear conversation with ai.`;
 
-      if (responseMessage) {
+      if (responseMessage && !responseMessage.includes(guideMessage)) {
         responseMessage += guideMessage;
         userHistory.push({ role: 'assistant', content: responseMessage });
         messageHistory.set(senderId, userHistory);
@@ -68,7 +72,7 @@ module.exports = {
         for (const message of finalMessages) {
           sendMessage(senderId, { text: message }, pageAccessToken);
         }
-      } else {
+      } else if (!responseMessage) {
         throw new Error("Received empty response from Groq.");
       }
 
@@ -78,4 +82,4 @@ module.exports = {
     }
   }
 };
-          
+        
