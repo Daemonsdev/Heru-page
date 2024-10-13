@@ -11,7 +11,7 @@ module.exports = {
       
 1. Commands: To interact with the bot, simply type a command followed by your query. For example, type 'luffy your query' to get a response from AI.
 2. Clear Conversation: If you wish to clear the conversation history at any time, just type 'clear', and the conversation will be reset.
-3. Error Handling: In the event of an error during processing, the bot will promptly notify you with an error message and the api or cause of ddos attack.
+3. Error Handling: In the event of an error during processing, the bot will promptly notify you with an error message and the API or cause of DDOS attack.
 4. Help: If you need further assistance, just type 'help' to receive guidance on available commands and features.
 5. Cool Features: This bot offers a range of functionalities, including conversational AI, image generation, and much more!
 
@@ -30,10 +30,18 @@ How can I assist you today? Designed by Heru.`;
         }
       ];
 
-      sendMessage(senderId, {
-        text: guideText,
-        buttons
-      }, pageAccessToken);
+      const messageData = {
+        attachment: {
+          type: 'template',
+          payload: {
+            template_type: 'button',
+            text: guideText,
+            buttons: buttons
+          }
+        }
+      };
+
+      sendMessage(senderId, messageData, pageAccessToken);
 
     } catch (error) {
       console.error('Error in guide command:', error);
@@ -41,4 +49,3 @@ How can I assist you today? Designed by Heru.`;
     }
   }
 };
-                    
