@@ -32,7 +32,7 @@ How can I assist you today? Designed by Heru.`;
 
       sendMessage(senderId, {
         text: guideText,
-        buttons // Pass the buttons to the sendMessage function
+        buttons
       }, pageAccessToken);
 
     } catch (error) {
