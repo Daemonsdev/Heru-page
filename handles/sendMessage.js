@@ -1,8 +1,8 @@
 const request = require('request');
 
 function sendMessage(senderId, message, pageAccessToken) {
-  if (!message || (!message.text && !message.attachment && !message.buttons)) {
-    console.error('Error: Message must provide valid text, attachment, or buttons.');
+  if (!message || (!message.text && !message.attachment)) {
+    console.error('Error: Message must provide valid text or attachment.');
     return;
   }
 
@@ -11,24 +11,12 @@ function sendMessage(senderId, message, pageAccessToken) {
     message: {}
   };
 
-  if (message.text && !message.buttons) {
+  if (message.text) {
     payload.message.text = message.text;
   }
 
   if (message.attachment) {
     payload.message.attachment = message.attachment;
-  }
-
-  // Check if buttons are present and format them correctly
-  if (message.buttons) {
-    payload.message.attachment = {
-      type: 'template',
-      payload: {
-        template_type: 'button',
-        text: message.text,
-        buttons: message.buttons
-      }
-    };
   }
 
   request({
