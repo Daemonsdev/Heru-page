@@ -61,7 +61,7 @@ module.exports = {
 
       console.log("Raw API Response:", responseMessage);
 
-      const guideMessage = `\n\n◉ Guide: type "help" to see all commands\n◉ Type "ai clear" to clear conversation with ai.`;
+      const guideMessage = `\n\n◉ Guide: type "help" to see all commands\n◉ Type "clear" to clear conversation with ai.`;
 
       if (responseMessage && !responseMessage.includes(guideMessage)) {
         responseMessage += guideMessage;
@@ -78,7 +78,7 @@ module.exports = {
 
     } catch (error) {
       console.error('Error communicating with Groq:', error.message);
-      sendMessage(senderId, { text: "I'm busy right now, please try again later." }, pageAccessToken);
+      sendMessage(senderId, { text: "Hello 🤗 Dont use ai instead question directly, this is automatically response, how may I assist you today?." }, pageAccessToken);
     }
   }
 };
