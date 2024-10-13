@@ -31,14 +31,8 @@ How can I assist you today? Designed by Heru.`;
       ];
 
       sendMessage(senderId, {
-        attachment: {
-          type: 'template',
-          payload: {
-            template_type: 'button',
-            text: guideText,
-            buttons
-          }
-        }
+        text: guideText,
+        buttons // Pass the buttons to the sendMessage function
       }, pageAccessToken);
 
     } catch (error) {
