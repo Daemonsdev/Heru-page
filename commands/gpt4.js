@@ -13,10 +13,10 @@ module.exports = {
     }
 
     try {
-      const apiUrl = `https://markdevs69v2.onrender.com/new/gpt4?query=${encodeURIComponent(prompt)}`;
+      const apiUrl = `https://markdevs69.vercel.app/api/v2/gpt4?query=${encodeURIComponent(prompt)}`;
       const response = await axios.get(apiUrl);
 
-      const text = response.data.answer || 'No response received from GPT-4. Please try again later.';
+      const text = response.data.respond || 'No response received from GPT-4. Please try again later.';
 
       sendMessage(senderId, { text }, pageAccessToken);
     } catch (error) {
