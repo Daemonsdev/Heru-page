@@ -2,7 +2,7 @@ const axios = require('axios');
 
 module.exports = {
   name: 'openai',
-  description: 'Query OpenAI for a response',
+  description: 'Inteact to OpenAi Assistant',
   author: 'Jay',
 
   async execute(senderId, args, pageAccessToken, sendMessage) {
