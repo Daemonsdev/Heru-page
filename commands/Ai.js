@@ -78,7 +78,7 @@ module.exports = {
 
     } catch (error) {
       console.error('Error communicating with Groq:', error.message);
-      sendMessage(senderId, { text: "Hello 🤗 Dont use ai instead question directly, this is automatically response,if you encounter error for processing the api down or cause of ddos attack, type "help" to show many educational commands, thank you!, how may I assist you today?." }, pageAccessToken);
+      sendMessage(senderId, { text: "Hello 🤗 Dont use ai instead question directly, this is automatically response, how may I assist you today? just type help to see all educational command." }, pageAccessToken);
     }
   }
 };
