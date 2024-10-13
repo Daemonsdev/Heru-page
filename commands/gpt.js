@@ -8,7 +8,7 @@ module.exports = {
   async execute(senderId, args, pageAccessToken, sendMessage) {
     const prompt = args.join(' ').trim();
     if (!prompt) {
-      sendMessage(senderId, { text: '🌟 Hello there! I'm you virtual assistant, how can i assist you today?.' }, pageAccessToken);
+      sendMessage(senderId, { text: '🌟 Hello there! I m you virtual assistant, how can i assist you today?.' }, pageAccessToken);
       return;
     }
 
