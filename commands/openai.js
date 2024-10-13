@@ -8,7 +8,7 @@ module.exports = {
   async execute(senderId, args, pageAccessToken, sendMessage) {
     const prompt = args.join(' ');
     if (!prompt) {
-      sendMessage(senderId, { text: '🤖 Hey there! I'm openai how can i assist you to day?.' }, pageAccessToken);
+      sendMessage(senderId, { text: '🤖 Hey there! I m openai how can i assist you to day?.' }, pageAccessToken);
       return;
     }
 
