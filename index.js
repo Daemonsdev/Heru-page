@@ -36,6 +36,18 @@ app.post('/webhook', (req, res) => {
           handleMessage(event, PAGE_ACCESS_TOKEN);
         } else if (event.postback) {
           handlePostback(event, PAGE_ACCESS_TOKEN);
+
+          // Handle the specific postback event for "GET_STARTED"
+          if (event.postback.payload === "GET_STARTED") {
+            axios.post(`https://graph.facebook.com/v11.0/me/messages?access_token=${PAGE_ACCESS_TOKEN}`, {
+              recipient: { id: event.sender.id },
+              message: { text: "Welcome" }
+            }).then(response => {
+              console.log('Welcome message sent:', response.data);
+            }).catch(error => {
+              console.error('Error sending welcome message:', error);
+            });
+          }
         }
       });
     });
@@ -120,5 +132,3 @@ app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
   loadMenuCommands();
 });
-
-      
