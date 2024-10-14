@@ -11,6 +11,7 @@ app.use(bodyParser.json());
 const VERIFY_TOKEN = 'pagebot';
 const PAGE_ACCESS_TOKEN = fs.readFileSync('token.txt', 'utf8').trim();
 
+// Webhook verification
 app.get('/webhook', (req, res) => {
   const mode = req.query['hub.mode'];
   const token = req.query['hub.verify_token'];
@@ -26,18 +27,29 @@ app.get('/webhook', (req, res) => {
   }
 });
 
+// Handle incoming messages or postbacks
 app.post('/webhook', async (req, res) => {
   const body = req.body;
 
   if (body.object === 'page') {
     for (const entry of body.entry) {
-      const webhookEvent = entry.messaging[0];
+      const webhookEvent = entry.messaging && entry.messaging[0];
+
+      if (!webhookEvent || !webhookEvent.sender) {
+        continue;
+      }
+
       const senderId = webhookEvent.sender.id;
 
-      if (webhookEvent.postback && webhookEvent.postback.payload === 'GET_STARTED_PAYLOAD') {
-        await typingIndicator(senderId);  // Show typing indicator
-        await sendMessage(senderId, 'Welcome! How can I assist you today?');
-        await sendQuickReplies(senderId);  // Send quick replies after the welcome message
+      try {
+        // Handle "Get Started" postback
+        if (webhookEvent.postback && webhookEvent.postback.payload === 'GET_STARTED_PAYLOAD') {
+          await typingIndicator(senderId);  // Show typing indicator
+          await sendMessage(senderId, 'Welcome! How can I assist you today?');
+          await sendQuickReplies(senderId);  // Send quick replies after the welcome message
+        }
+      } catch (error) {
+        console.error('Error processing webhook event:', error.message);
       }
     }
     res.status(200).send('EVENT_RECEIVED');
@@ -46,9 +58,10 @@ app.post('/webhook', async (req, res) => {
   }
 });
 
+// Send a message to the user
 async function sendMessage(senderId, message) {
   try {
-    await axios.post('https://graph.facebook.com/v13.0/me/messages', {
+    await axios.post(`https://graph.facebook.com/v13.0/me/messages`, {
       recipient: { id: senderId },
       message: typeof message === 'string' ? { text: message } : message,
     }, {
@@ -60,7 +73,7 @@ async function sendMessage(senderId, message) {
   }
 }
 
-// Function to show typing indicator
+// Show typing indicator
 async function typingIndicator(senderId) {
   try {
     await axios.post(`https://graph.facebook.com/v13.0/me/messages`, {
@@ -75,7 +88,7 @@ async function typingIndicator(senderId) {
   }
 }
 
-// Function to send quick replies
+// Send quick replies
 async function sendQuickReplies(senderId) {
   const quickReplies = [
     {
@@ -96,6 +109,7 @@ async function sendQuickReplies(senderId) {
   });
 }
 
+// Load menu commands
 const loadMenuCommands = async () => {
   try {
     const loadCmd = await axios.post(`https://graph.facebook.com/v21.0/me/messenger_profile?access_token=${PAGE_ACCESS_TOKEN}`, {
@@ -129,18 +143,18 @@ const loadMenuCommands = async () => {
     });
 
     if (loadCmd.data.result === "success") {
-      console.log("Commands loaded!");
+      console.log("Commands loaded successfully!");
     } else {
-      console.log("Failed to load commands");
+      console.log("Failed to load commands.");
     }
   } catch (error) {
-    console.error('Error loading commands:', error);
+    console.error('Error loading commands:', error.message);
   }
 };
 
+// Start the server and load commands
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
   loadMenuCommands();
 });
-  
