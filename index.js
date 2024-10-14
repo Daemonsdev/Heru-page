@@ -26,37 +26,75 @@ app.get('/webhook', (req, res) => {
   }
 });
 
-app.post('/webhook', (req, res) => {
+app.post('/webhook', async (req, res) => {
   const body = req.body;
 
   if (body.object === 'page') {
-    body.entry.forEach(entry => {
-      entry.messaging.forEach(event => {
-        if (event.message) {
-          handleMessage(event, PAGE_ACCESS_TOKEN);
-        } else if (event.postback) {
-          handlePostback(event, PAGE_ACCESS_TOKEN);
+    for (const entry of body.entry) {
+      const webhookEvent = entry.messaging[0];
+      const senderId = webhookEvent.sender.id;
 
-          // Handle the specific postback event for "GET_STARTED"
-          if (event.postback.payload === "GET_STARTED") {
-            axios.post(`https://graph.facebook.com/v11.0/me/messages?access_token=${PAGE_ACCESS_TOKEN}`, {
-              recipient: { id: event.sender.id },
-              message: { text: "Welcome" }
-            }).then(response => {
-              console.log('Welcome message sent:', response.data);
-            }).catch(error => {
-              console.error('Error sending welcome message:', error);
-            });
-          }
-        }
-      });
-    });
-
+      if (webhookEvent.postback && webhookEvent.postback.payload === 'GET_STARTED_PAYLOAD') {
+        await typingIndicator(senderId);  // Show typing indicator
+        await sendMessage(senderId, 'Welcome! How can I assist you today?');
+        await sendQuickReplies(senderId);  // Send quick replies after the welcome message
+      }
+    }
     res.status(200).send('EVENT_RECEIVED');
   } else {
     res.sendStatus(404);
   }
 });
+
+async function sendMessage(senderId, message) {
+  try {
+    await axios.post('https://graph.facebook.com/v13.0/me/messages', {
+      recipient: { id: senderId },
+      message: typeof message === 'string' ? { text: message } : message,
+    }, {
+      params: { access_token: PAGE_ACCESS_TOKEN },
+    });
+    console.log(`Message sent to ${senderId}`);
+  } catch (error) {
+    console.error('Error sending message:', error.message);
+  }
+}
+
+// Function to show typing indicator
+async function typingIndicator(senderId) {
+  try {
+    await axios.post(`https://graph.facebook.com/v13.0/me/messages`, {
+      recipient: { id: senderId },
+      sender_action: 'typing_on',
+    }, {
+      params: { access_token: PAGE_ACCESS_TOKEN },
+    });
+    console.log('Typing indicator sent to', senderId);
+  } catch (error) {
+    console.error('Error sending typing indicator:', error.message);
+  }
+}
+
+// Function to send quick replies
+async function sendQuickReplies(senderId) {
+  const quickReplies = [
+    {
+      content_type: "text",
+      title: "Get Help",
+      payload: "GET_HELP",
+    },
+    {
+      content_type: "text",
+      title: "Ask AI",
+      payload: "ASK_AI",
+    },
+  ];
+
+  await sendMessage(senderId, {
+    text: "What would you like to do?",
+    quick_replies: quickReplies,
+  });
+}
 
 const loadMenuCommands = async () => {
   try {
@@ -100,36 +138,9 @@ const loadMenuCommands = async () => {
   }
 };
 
-const sendContactMessage = (senderId) => {
-  const messageData = {
-    attachment: {
-      type: 'template',
-      payload: {
-        template_type: 'button',
-        text: `Any problem or encounter errors please contact admin to Facebook, if command not working please use another command. This is for educational purposes only. Thank you!`,
-        buttons: [
-          {
-            type: 'web_url',
-            url: `https://www.facebook.com/jaymar.dev.00`,
-            title: 'Contact Owner'
-          }
-        ]
-      }
-    }
-  };
-
-  axios.post(`https://graph.facebook.com/v11.0/me/messages?access_token=${PAGE_ACCESS_TOKEN}`, {
-    recipient: { id: senderId },
-    message: messageData
-  }).then(response => {
-    console.log('Contact message sent:', response.data);
-  }).catch(error => {
-    console.error('Error sending contact message:', error);
-  });
-};
-
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
   loadMenuCommands();
 });
+    
