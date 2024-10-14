@@ -21,23 +21,29 @@ module.exports = {
 
       sendMessage(senderId, { text: `Searching for ${query}` }, pageAccessToken);
 
+      // Fetch image from Pollination AI
       const response = await axios.get(`https://image.pollinations.ai/prompt/${encodeURIComponent(query)}`, {
         responseType: 'arraybuffer',
       });
 
-      fs.writeFileSync(path, Buffer.from(response.data, 'utf-8'));
+      // Save image to local path
+      fs.writeFileSync(path, Buffer.from(response.data, 'binary'));
 
-      setTimeout(function () {
-        sendMessage(senderId, {
-          text: 'Download Successfully!',
-          attachment: {
-            type: 'image',
-            payload: {
-              is_reusable: true,
-              url: path
-            }
+      // Send image to user
+      sendMessage(senderId, {
+        attachment: {
+          type: 'image',
+          payload: {
+            is_reusable: true,
+            url: `file://${path}`
           }
-        }, pageAccessToken, () => fs.unlinkSync(path));
+        }
+      }, pageAccessToken);
+
+      // Clean up the file after sending
+      setTimeout(() => {
+        fs.unlinkSync(path);
+        console.log('Image file deleted:', path);
       }, 5000);
 
     } catch (error) {
