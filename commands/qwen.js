@@ -2,7 +2,7 @@ const axios = require('axios');
 
 module.exports = {
   name: 'qwen',
-  description: 'Generate response from Qwen-1.572BChat API based on user prompt.',
+  description: 'Generate response from Qwen-1.572BChat',
   author: 'Jay',
 
   async execute(senderId, args, pageAccessToken, sendMessage) {
