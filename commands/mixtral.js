@@ -2,7 +2,7 @@ const axios = require('axios');
 
 module.exports = {
   name: 'mixtral',
-  description: 'Generate response from Mixtral API based on user prompt.',
+  description: 'Generate response from Mixtral',
   author: 'Jay',
 
   async execute(senderId, args, pageAccessToken, sendMessage) {
