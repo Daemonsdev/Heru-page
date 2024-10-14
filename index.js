@@ -128,7 +128,7 @@ const sendContactMessage = (senderId) => {
   });
 };
 
-app.listen(PORT, () => {
+app.listen(3000, () => {
   console.log(`Server is running on port ${PORT}`);
   loadMenuCommands();
 });
