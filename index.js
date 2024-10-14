@@ -11,7 +11,6 @@ app.use(bodyParser.json());
 const VERIFY_TOKEN = 'pagebot';
 const PAGE_ACCESS_TOKEN = fs.readFileSync('token.txt', 'utf8').trim();
 
-// Webhook verification
 app.get('/webhook', (req, res) => {
   const mode = req.query['hub.mode'];
   const token = req.query['hub.verify_token'];
@@ -27,29 +26,33 @@ app.get('/webhook', (req, res) => {
   }
 });
 
-// Handle incoming messages or postbacks
 app.post('/webhook', async (req, res) => {
   const body = req.body;
 
   if (body.object === 'page') {
     for (const entry of body.entry) {
-      const webhookEvent = entry.messaging && entry.messaging[0];
-
-      if (!webhookEvent || !webhookEvent.sender) {
-        continue;
-      }
-
+      const webhookEvent = entry.messaging[0];
       const senderId = webhookEvent.sender.id;
 
-      try {
-        // Handle "Get Started" postback
-        if (webhookEvent.postback && webhookEvent.postback.payload === 'GET_STARTED_PAYLOAD') {
-          await typingIndicator(senderId);  // Show typing indicator
-          await sendMessage(senderId, 'Welcome! How can I assist you today?');
-          await sendQuickReplies(senderId);  // Send quick replies after the welcome message
+      if (webhookEvent.message) {
+        handleMessage(webhookEvent, PAGE_ACCESS_TOKEN);
+      } else if (webhookEvent.postback) {
+        handlePostback(webhookEvent, PAGE_ACCESS_TOKEN);
+
+        if (webhookEvent.postback.payload === "GET_STARTED_PAYLOAD") {
+          await sendMessage(senderId, 'Welcome! How can I assist you today?', PAGE_ACCESS_TOKEN);
         }
-      } catch (error) {
-        console.error('Error processing webhook event:', error.message);
+
+        if (webhookEvent.postback.payload === "GET_STARTED") {
+          axios.post(`https://graph.facebook.com/v11.0/me/messages?access_token=${PAGE_ACCESS_TOKEN}`, {
+            recipient: { id: webhookEvent.sender.id },
+            message: { text: "Welcome" }
+          }).then(response => {
+            console.log('Welcome message sent:', response.data);
+          }).catch(error => {
+            console.error('Error sending welcome message:', error);
+          });
+        }
       }
     }
     res.status(200).send('EVENT_RECEIVED');
@@ -58,14 +61,13 @@ app.post('/webhook', async (req, res) => {
   }
 });
 
-// Send a message to the user
-async function sendMessage(senderId, message) {
+async function sendMessage(senderId, message, pageAccessToken) {
   try {
-    await axios.post(`https://graph.facebook.com/v13.0/me/messages`, {
+    await axios.post('https://graph.facebook.com/v13.0/me/messages', {
       recipient: { id: senderId },
-      message: typeof message === 'string' ? { text: message } : message,
+      message: { text: message },
     }, {
-      params: { access_token: PAGE_ACCESS_TOKEN },
+      params: { access_token: pageAccessToken },
     });
     console.log(`Message sent to ${senderId}`);
   } catch (error) {
@@ -73,43 +75,6 @@ async function sendMessage(senderId, message) {
   }
 }
 
-// Show typing indicator
-async function typingIndicator(senderId) {
-  try {
-    await axios.post(`https://graph.facebook.com/v13.0/me/messages`, {
-      recipient: { id: senderId },
-      sender_action: 'typing_on',
-    }, {
-      params: { access_token: PAGE_ACCESS_TOKEN },
-    });
-    console.log('Typing indicator sent to', senderId);
-  } catch (error) {
-    console.error('Error sending typing indicator:', error.message);
-  }
-}
-
-// Send quick replies
-async function sendQuickReplies(senderId) {
-  const quickReplies = [
-    {
-      content_type: "text",
-      title: "Get Help",
-      payload: "GET_HELP",
-    },
-    {
-      content_type: "text",
-      title: "Ask AI",
-      payload: "ASK_AI",
-    },
-  ];
-
-  await sendMessage(senderId, {
-    text: "What would you like to do?",
-    quick_replies: quickReplies,
-  });
-}
-
-// Load menu commands
 const loadMenuCommands = async () => {
   try {
     const loadCmd = await axios.post(`https://graph.facebook.com/v21.0/me/messenger_profile?access_token=${PAGE_ACCESS_TOKEN}`, {
@@ -143,18 +108,19 @@ const loadMenuCommands = async () => {
     });
 
     if (loadCmd.data.result === "success") {
-      console.log("Commands loaded successfully!");
+      console.log("Commands loaded!");
     } else {
-      console.log("Failed to load commands.");
+      console.log("Failed to load commands");
     }
   } catch (error) {
-    console.error('Error loading commands:', error.message);
+    console.error('Error loading commands:', error);
   }
 };
 
-// Start the server and load commands
 const PORT = process.env.PORT || 3000;
+
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
   loadMenuCommands();
 });
+                  
