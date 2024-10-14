@@ -14,6 +14,7 @@ module.exports = {
 3. Error Handling: In the event of an error during processing, the bot will promptly notify you with an error message and the api or cause of ddos attack.
 4. Help: If you need further assistance, just type 'help' to receive guidance on available commands and features.
 5. Cool Features: This bot offers a range of functionalities, including conversational AI, image generation, and much more!
+6. If PageBot not replying to your message Please try question again if not maybe maintenance.
 
 How can I assist you today? Designed by Heru.`;
 
