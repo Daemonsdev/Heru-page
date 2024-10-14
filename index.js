@@ -26,6 +26,7 @@ app.get('/webhook', (req, res) => {
   }
 });
 
+// Handle incoming messages or postbacks
 app.post('/webhook', async (req, res) => {
   const body = req.body;
 
@@ -34,10 +35,11 @@ app.post('/webhook', async (req, res) => {
       const webhookEvent = entry.messaging[0];
       const senderId = webhookEvent.sender.id;
 
+      // Handling "Get Started" payload
       if (webhookEvent.postback && webhookEvent.postback.payload === 'GET_STARTED_PAYLOAD') {
-        await typingIndicator(senderId);  // Show typing indicator
+        await typingIndicator(senderId); // Show typing indicator
         await sendMessage(senderId, 'Welcome! How can I assist you today?');
-        await sendQuickReplies(senderId);  // Send quick replies after the welcome message
+        await sendQuickReplies(senderId); // Send quick replies after the welcome message
       }
     }
     res.status(200).send('EVENT_RECEIVED');
@@ -46,6 +48,7 @@ app.post('/webhook', async (req, res) => {
   }
 });
 
+// Function to send a message
 async function sendMessage(senderId, message) {
   try {
     await axios.post('https://graph.facebook.com/v13.0/me/messages', {
@@ -96,51 +99,34 @@ async function sendQuickReplies(senderId) {
   });
 }
 
-const loadMenuCommands = async () => {
+// Function to load "Get Started" button
+const setupGetStartedButton = async () => {
   try {
-    const loadCmd = await axios.post(`https://graph.facebook.com/v21.0/me/messenger_profile?access_token=${PAGE_ACCESS_TOKEN}`, {
-      commands: [
-        {
-          locale: "default",
-          commands: [
-            { name: "ai", description: "Interact with AI models" },
-            { name: "boxai", description: "Advanced AI in a box" },
-            { name: "deepseek", description: "Deep search AI" },
-            { name: "gemini", description: "Gemini AI assistant" },
-            { name: "gpt", description: "Chat with GPT-3" },
-            { name: "gpt4", description: "Chat with GPT-4" },
-            { name: "gpt4o", description: "Optimized GPT-4 version" },
-            { name: "guide", description: "Bot usage guide" },
-            { name: "luffy", description: "Special AI assistant Luffy" },
-            { name: "lyrics", description: "Fetch song lyrics" },
-            { name: "mixtral", description: "AI-powered multi-model assistant" },
-            { name: "openai", description: "Interact with OpenAI models" },
-            { name: "qwen", description: "Qwen AI assistant" },
-            { name: "help", description: "Get a list of available commands" },
-            { name: "poli", description: "Generate image on Poli Ai" },
-            { name: "contact", description: "Contact the owner for assistance" }
-          ]
-        }
-      ]
+    const response = await axios.post(`https://graph.facebook.com/v13.0/me/messenger_profile?access_token=${PAGE_ACCESS_TOKEN}`, {
+      get_started: {
+        payload: "GET_STARTED_PAYLOAD"  // Set the payload for the Get Started button
+      }
     }, {
       headers: {
         "Content-Type": "application/json"
       }
     });
 
-    if (loadCmd.data.result === "success") {
-      console.log("Commands loaded!");
+    if (response.data.result === "success") {
+      console.log('Get Started button set up successfully!');
     } else {
-      console.log("Failed to load commands");
+      console.log('Failed to set up Get Started button.');
     }
   } catch (error) {
-    console.error('Error loading commands:', error);
+    console.error('Error setting up Get Started button:', error);
   }
 };
 
+// Set up the "Get Started" button when the server starts
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
+  setupGetStartedButton(); // Set up the "Get Started" button on server start
   loadMenuCommands();
 });
-    
+  
