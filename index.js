@@ -46,7 +46,6 @@ app.post('/webhook', (req, res) => {
   }
 });
 
-// Load commands to the menu button
 const loadMenuCommands = async () => {
   try {
     const loadCmd = await axios.post(`https://graph.facebook.com/v21.0/me/messenger_profile?access_token=${PAGE_ACCESS_TOKEN}`, {
@@ -67,7 +66,8 @@ const loadMenuCommands = async () => {
             { name: "mixtral", description: "AI-powered multi-model assistant" },
             { name: "openai", description: "Interact with OpenAI models" },
             { name: "qwen", description: "Qwen AI assistant" },
-            { name: "help", description: "Get a list of available commands" }
+            { name: "help", description: "Get a list of available commands" },
+            { name: "contact", description: "Contact the owner for assistance" }
           ]
         }
       ]
@@ -87,27 +87,37 @@ const loadMenuCommands = async () => {
   }
 };
 
-// Contact owner button
-const contactOwnerButton = {
-  attachment: {
-    type: 'template',
-    payload: {
-      template_type: 'button',
-      text: `Any problem or encounter errors please contact admin to Facebook, if command not working please use another commands this is for educational purposes only thank you!`,
-      buttons: [
-        {
-          type: 'web_url',
-          url: `https://www.facebook.com/jaymar.dev.00`,
-          title: 'Contact Owner'
-        }
-      ]
+const sendContactMessage = (senderId) => {
+  const messageData = {
+    attachment: {
+      type: 'template',
+      payload: {
+        template_type: 'button',
+        text: `Any problem or encounter errors please contact admin to Facebook, if command not working please use another command. This is for educational purposes only. Thank you!`,
+        buttons: [
+          {
+            type: 'web_url',
+            url: `https://www.facebook.com/jaymar.dev.00`,
+            title: 'Contact Owner'
+          }
+        ]
+      }
     }
-  }
+  };
+
+  axios.post(`https://graph.facebook.com/v11.0/me/messages?access_token=${PAGE_ACCESS_TOKEN}`, {
+    recipient: { id: senderId },
+    message: messageData
+  }).then(response => {
+    console.log('Contact message sent:', response.data);
+  }).catch(error => {
+    console.error('Error sending contact message:', error);
+  });
 };
 
-const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
   loadMenuCommands();
 });
-              
+
+      
