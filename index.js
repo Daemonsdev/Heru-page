@@ -11,7 +11,6 @@ app.use(bodyParser.json());
 const VERIFY_TOKEN = 'pagebot';
 const PAGE_ACCESS_TOKEN = fs.readFileSync('token.txt', 'utf8').trim();
 
-// Webhook verification
 app.get('/webhook', (req, res) => {
   const mode = req.query['hub.mode'];
   const token = req.query['hub.verify_token'];
@@ -27,7 +26,6 @@ app.get('/webhook', (req, res) => {
   }
 });
 
-// Handling messages and postbacks
 app.post('/webhook', (req, res) => {
   const body = req.body;
 
@@ -55,10 +53,22 @@ const loadMenuCommands = async () => {
       commands: [
         {
           locale: "default",
-          commands: [{
-            name: "help",
-            description: "Get help on how to use this bot"
-          }]
+          commands: [
+            { name: "ai", description: "Interact with AI models" },
+            { name: "boxai", description: "Advanced AI in a box" },
+            { name: "deepseek", description: "Deep search AI" },
+            { name: "gemini", description: "Gemini AI assistant" },
+            { name: "gpt", description: "Chat with GPT-3" },
+            { name: "gpt4", description: "Chat with GPT-4" },
+            { name: "gpt4o", description: "Optimized GPT-4 version" },
+            { name: "guide", description: "Bot usage guide" },
+            { name: "luffy", description: "Special AI assistant Luffy" },
+            { name: "lyrics", description: "Fetch song lyrics" },
+            { name: "mixtral", description: "AI-powered multi-model assistant" },
+            { name: "openai", description: "Interact with OpenAI models" },
+            { name: "qwen", description: "Qwen AI assistant" },
+            { name: "help", description: "Get a list of available commands" }
+          ]
         }
       ]
     }, {
@@ -77,8 +87,27 @@ const loadMenuCommands = async () => {
   }
 };
 
+// Contact owner button
+const contactOwnerButton = {
+  attachment: {
+    type: 'template',
+    payload: {
+      template_type: 'button',
+      text: `Any problem or encounter errors please contact admin to Facebook, if command not working please use another commands this is for educational purposes only thank you!`,
+      buttons: [
+        {
+          type: 'web_url',
+          url: `https://www.facebook.com/jaymar.dev.00`,
+          title: 'Contact Owner'
+        }
+      ]
+    }
+  }
+};
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
-  loadMenuCommands();  // Load the menu commands when the server starts
+  loadMenuCommands();
 });
+              
