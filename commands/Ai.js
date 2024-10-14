@@ -15,7 +15,7 @@ function splitMessageIntoChunks(text, maxLength) {
 
 module.exports = {
   name: 'ai',
-  description: 'Response within seconds',
+  description: 'Automatically response no need use ai to question.',
   author: 'Jay',
 
   async execute(senderId, messageText, pageAccessToken, sendMessage) {
