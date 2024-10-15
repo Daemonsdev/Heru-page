@@ -2,6 +2,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const axios = require('axios');
+const path = require('path');
+
 const { handleMessage } = require('./handles/handleMessage');
 const { handlePostback } = require('./handles/handlePostback');
 
@@ -87,30 +89,22 @@ async function sendQuickReplies(senderId) {
   }, PAGE_ACCESS_TOKEN);
 }
 
+// Automatically load commands from the 'commands' folder
 const loadMenuCommands = async () => {
   try {
+    const commandsDir = path.join(__dirname, 'commands');
+    const commandFiles = fs.readdirSync(commandsDir).filter(file => file.endsWith('.js'));
+
+    const commandsList = commandFiles.map(file => {
+      const command = require(path.join(commandsDir, file));
+      return { name: command.name, description: command.description || 'No description available' };
+    });
+
     const loadCmd = await axios.post(`https://graph.facebook.com/v21.0/me/messenger_profile?access_token=${PAGE_ACCESS_TOKEN}`, {
       commands: [
         {
           locale: "default",
-          commands: [
-            { name: "ai", description: "Interact with AI models" },
-            { name: "boxai", description: "Advanced AI in a box" },
-            { name: "deepseek", description: "Deep search AI" },
-            { name: "gemini", description: "Gemini AI assistant" },
-            { name: "gpt", description: "Chat with GPT-3" },
-            { name: "gpt4", description: "Chat with GPT-4" },
-            { name: "gpt4o", description: "Optimized GPT-4 version" },
-            { name: "guide", description: "Bot usage guide" },
-            { name: "luffy", description: "Special AI assistant Luffy" },
-            { name: "lyrics", description: "Fetch song lyrics" },
-            { name: "mixtral", description: "AI-powered multi-model assistant" },
-            { name: "openai", description: "Interact with OpenAI models" },
-            { name: "qwen", description: "Qwen AI assistant" },
-            { name: "help", description: "Get a list of available commands" },
-            { name: "poli", description: "Generate image on Poli Ai" },
-            { name: "pinterest", description: "Search image" }
-          ]
+          commands: commandsList
         }
       ]
     }, {
@@ -135,4 +129,4 @@ app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
   loadMenuCommands();
 });
-      
+            
