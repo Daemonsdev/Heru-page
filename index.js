@@ -108,7 +108,8 @@ const loadMenuCommands = async () => {
             { name: "openai", description: "Interact with OpenAI models" },
             { name: "qwen", description: "Qwen AI assistant" },
             { name: "help", description: "Get a list of available commands" },
-            { name: "poli", description: "Generate image on Poli Ai" }
+            { name: "poli", description: "Generate image on Poli Ai" },
+            { name: "pinterest", description: "Search image" }
           ]
         }
       ]
