@@ -41,12 +41,6 @@ app.post('/webhook', async (req, res) => {
         handleMessage(webhookEvent, PAGE_ACCESS_TOKEN);
       } else if (webhookEvent.postback) {
         handlePostback(webhookEvent, PAGE_ACCESS_TOKEN);
-
-        // Fix: Handle "GET_STARTED" properly
-        if (webhookEvent.postback.payload === "GET_STARTED" || webhookEvent.postback.payload === "GET_STARTED_PAYLOAD") {
-          await sendMessage(senderId, { text: "Welcome! How can I assist you today?" }, PAGE_ACCESS_TOKEN);
-          await sendQuickReplies(senderId);  // Send quick replies after welcome message
-        }
       }
     }
     res.status(200).send('EVENT_RECEIVED');
@@ -67,27 +61,6 @@ async function sendMessage(senderId, message, pageAccessToken) {
   } catch (error) {
     console.error('Error sending message:', error.message);
   }
-}
-
-// Quick replies function
-async function sendQuickReplies(senderId) {
-  const quickReplies = [
-    {
-      content_type: "text",
-      title: "Get Help",
-      payload: "GET_HELP",
-    },
-    {
-      content_type: "text",
-      title: "Ask AI",
-      payload: "ASK_AI",
-    },
-  ];
-
-  await sendMessage(senderId, {
-    text: "What would you like to do?",
-    quick_replies: quickReplies,
-  }, PAGE_ACCESS_TOKEN);
 }
 
 // Automatically load commands from the 'commands' folder
@@ -130,4 +103,4 @@ app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
   loadMenuCommands();
 });
-            
+                           
